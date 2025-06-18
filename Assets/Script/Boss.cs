@@ -1,9 +1,13 @@
+using System.Collections;
 using UnityEngine;
 
 public class Boss : MonoBehaviour
 {
     Rigidbody2D rigid;
-    public int nextMove;
+    public int BossHp;
+    public int Speed;
+    public int jumpPower;
+    public bool jumpAble;
     SpriteRenderer spriteRenderer;
     Animator anim;
 
@@ -14,63 +18,98 @@ public class Boss : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
         Think();
-
-        Invoke("Think", 5);
     }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+        //StartCoroutine(DelayTime());
+        BossHp = 500;
+        jumpPower = 5;
+        jumpAble = false;
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     void FixedUpdate()
     {
-        rigid.linearVelocity = new Vector2(nextMove, rigid.linearVelocityY);
+        rigid.linearVelocity = new Vector2(Speed, rigid.linearVelocity.y);
 
         //플랫폼 체크
-        Vector2 frontVec = new Vector2(rigid.position.x + nextMove , rigid.position.y);
-        Debug.DrawRay(frontVec, Vector3.down, new Color(0, 1, 0));
-        RaycastHit2D rayHit = Physics2D.Raycast(frontVec, Vector2.down, 1, LayerMask.GetMask("Platform"));
+        Vector2 frontVec = new Vector2(rigid.position.x + Speed * 0.5f, rigid.position.y);
+        Debug.DrawRay(frontVec, Vector2.down * 2f, Color.red);
 
-        if (Physics.Raycast(transform.position, Vector3.forward, out rayHit, 5f)){
-            if (rayHit.collider.CompareTag("Wall"))
-            {
-                turn();
-                Debug.Log("Enemy에 맞음!");
-            }
-}
-/*
-        if(rayHit.collider == ){
+        RaycastHit2D groundHit = Physics2D.Raycast(frontVec, Vector2.down, 2f, LayerMask.GetMask("Platform"));
+
+        if (groundHit.collider == null)
+        {
             turn();
+            Debug.Log("플랫폼 없음 방향 전환");
         }
-        */
 
+        //벽 체크
+        Vector2 wallCheckDir = new Vector2(Speed, 0);
+        Debug.DrawRay(frontVec, wallCheckDir * 1f, Color.blue);
+
+        RaycastHit2D wallHit = Physics2D.Raycast(transform.position, wallCheckDir, 1f, LayerMask.GetMask("Wall"));
+
+        //가는 방향에 맞게 방향전환
+        if (wallHit.collider != null && wallHit.collider.CompareTag("Wall"))
+        {
+            turn();
+            Debug.Log("벽 감지됨");
+        }
+
+        if (Speed > 0)
+        {
+            spriteRenderer.flipX = false;
+        }
+        else if (Speed < 0)
+        {
+            spriteRenderer.flipX = true;
+        }
+                
+
+    if (BossHp < 500 && jumpAble == false)
+        {
+            StartCoroutine(BossJumpWithDelay(2f)); // 2초 대기 후 점프
+        }
     }
 
 
-    void turn(){
-        nextMove *= -1;
-        spriteRenderer.flipX = nextMove == 1;
+    void turn()
+    {
+        Speed *= -1;
+        spriteRenderer.flipX = Speed == 1;
 
         CancelInvoke();
-        Invoke("Think",  5);
+        Invoke("Think", 5);
     }
 
     void Think()
     {
-        nextMove = Random.Range(-1, 2);
+        Speed = Random.Range(-2, 2);
 
-
-
-        anim.SetInteger("walkSpeed", nextMove);
+        anim.SetInteger("walkSpeed", Speed);
 
         float nextThinkTime = Random.Range(2f, 5f);
         Invoke("Think", nextThinkTime);
     }
+
+    IEnumerator BossJumpWithDelay(float delay)
+    {
+        jumpAble = true;
+        yield return new WaitForSeconds(delay);
+    
+        // 점프 실행
+        rigid.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
+
+        // 점프 후 다시 점프하지 않도록 일정 시간 후 jumpAble을 false로
+        yield return new WaitForSeconds(3f); // 예: 3초 후에 다시 점프 불가
+        jumpAble = false;
+    }
+  
 }
