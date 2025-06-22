@@ -23,7 +23,7 @@ public class Boss : MonoBehaviour
     void Start()
     {
         //StartCoroutine(DelayTime());
-        BossHp = 500;
+        BossHp = 10000;
         jumpPower = 5;
         jumpAble = false;
     }
@@ -44,7 +44,7 @@ public class Boss : MonoBehaviour
 
         RaycastHit2D groundHit = Physics2D.Raycast(frontVec, Vector2.down, 2f, LayerMask.GetMask("Platform"));
 
-        if (groundHit.collider == null)
+        if (groundHit.collider == null && jumpAble != true)
         {
             turn();
             Debug.Log("플랫폼 없음 방향 전환");
@@ -71,12 +71,25 @@ public class Boss : MonoBehaviour
         {
             spriteRenderer.flipX = true;
         }
-                
 
-    if (BossHp < 500 && jumpAble == false)
+
+        if (BossHp < 5000 && jumpAble == false)
         {
             StartCoroutine(BossJumpWithDelay(2f)); // 2초 대기 후 점프
         }
+
+        if (jumpAble == true)
+        {
+            anim.SetBool("isJump", true);
+        }
+
+        if (rigid.linearVelocity.normalized.y < 0)
+        {
+            anim.SetBool("isJump", false);
+            anim.SetBool("isFall", true);
+        }
+        else
+            anim.SetBool("isFall", false);
     }
 
 
@@ -95,6 +108,16 @@ public class Boss : MonoBehaviour
 
         anim.SetInteger("walkSpeed", Speed);
 
+        
+        if (Speed == 0)
+        {
+            anim.SetBool("isWalking", false);
+        }
+        else
+        {
+            anim.SetBool("isWaliking", true);
+        }
+
         float nextThinkTime = Random.Range(2f, 5f);
         Invoke("Think", nextThinkTime);
     }
@@ -102,7 +125,6 @@ public class Boss : MonoBehaviour
     IEnumerator BossJumpWithDelay(float delay)
     {
         jumpAble = true;
-        yield return new WaitForSeconds(delay);
     
         // 점프 실행
         rigid.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
