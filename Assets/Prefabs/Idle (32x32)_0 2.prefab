@@ -31,7 +31,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0.010024542, y: -0, z: -0, w: 0.9999498}
   m_LocalPosition: {x: 33.38, y: -1.69, z: -0.04}
-  m_LocalScale: {x: 7.4999995, y: 7.4999995, z: 1}
+  m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -152,7 +152,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d58870fd715d3e48a345b21d726a334, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  BossHp: 0
   Speed: 0
+  jumpPower: 0
+  jumpAble: 0
 --- !u!70 &6929022894577432450
 CapsuleCollider2D:
   m_ObjectHideFlags: 0

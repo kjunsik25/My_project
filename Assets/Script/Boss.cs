@@ -31,7 +31,18 @@ public class Boss : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (jumpAble == true && rigid.linearVelocity.normalized.y > 0)
+        {
+            anim.SetBool("isJump", true);
+        }
 
+        if (rigid.linearVelocity.normalized.y < 0)
+        {
+            anim.SetBool("isJump", false);
+            anim.SetBool("isFall", true);
+        }
+        else
+            anim.SetBool("isFall", false);
     }
 
     void FixedUpdate()
@@ -78,18 +89,7 @@ public class Boss : MonoBehaviour
             StartCoroutine(BossJumpWithDelay(2f)); // 2초 대기 후 점프
         }
 
-        if (jumpAble == true)
-        {
-            anim.SetBool("isJump", true);
-        }
-
-        if (rigid.linearVelocity.normalized.y < 0)
-        {
-            anim.SetBool("isJump", false);
-            anim.SetBool("isFall", true);
-        }
-        else
-            anim.SetBool("isFall", false);
+       
     }
 
 
@@ -104,7 +104,9 @@ public class Boss : MonoBehaviour
 
     void Think()
     {
-        Speed = Random.Range(-2, 2);
+        Speed = Random.Range(-1, 1);
+
+        Speed = Speed * 2;
 
         anim.SetInteger("walkSpeed", Speed);
 
@@ -124,10 +126,12 @@ public class Boss : MonoBehaviour
 
     IEnumerator BossJumpWithDelay(float delay)
     {
-        jumpAble = true;
+        
     
         // 점프 실행
         rigid.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
+
+        jumpAble = true;
 
         // 점프 후 다시 점프하지 않도록 일정 시간 후 jumpAble을 false로
         yield return new WaitForSeconds(3f); // 예: 3초 후에 다시 점프 불가
