@@ -7,6 +7,7 @@ TagManager:
   - Ground
   - Wall
   - Clear
+  - ReturnStage
   layers:
   - Default
   - TransparentFX
@@ -17,8 +18,8 @@ TagManager:
   - Platform
   - Wall
   - Clear
-  - 
-  - 
+  - ReturnStage
+  - BackGround
   - 
   - 
   - 

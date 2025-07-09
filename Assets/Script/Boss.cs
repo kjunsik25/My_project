@@ -27,6 +27,7 @@ public class Boss : MonoBehaviour
         //StartCoroutine(DelayTime());
         BossDmg = 2;
         BossHp = 10000;
+        Speed = 0;
         jumpPower = 0;
         BossJumpDmg = 10;
         jumpAble = false;
@@ -61,7 +62,7 @@ public class Boss : MonoBehaviour
 
         RaycastHit2D groundHit = Physics2D.Raycast(frontVec, Vector2.down, 2f, LayerMask.GetMask("Platform"));
 
-        if (groundHit.collider == null && jumpAble != true)
+        if (groundHit.collider == null && jumpAble == false)
         {
             turn();
             Debug.Log("플랫폼 없음 방향 전환");
@@ -129,15 +130,6 @@ public class Boss : MonoBehaviour
 
         anim.SetInteger("walkSpeed", Speed);
 
-        
-        if (Speed == 0)
-        {
-            anim.SetBool("isWalking", false);
-        }
-        else
-        {
-            anim.SetBool("isWaliking", true);
-        }
 
         float nextThinkTime = Random.Range(2f, 5f);
         Invoke("Think", nextThinkTime);
